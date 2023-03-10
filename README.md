@@ -1,106 +1,80 @@
 # NuOsTheorySpring23
-By typing command
-sudo apt update && sudo apt upgrade
-Download Packages to compile the kernel
-sudo apt install build-essential libncurses-dev libssl-dev libelf-dev bison flex -y
-And we need and extra package which dwarves
-We will install it by typing sudo apt install dwarves (Compiltion occurs when we dont have this
-package)
-Download the Kernel from kernel.org
-wget -P ~/ https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.8.1.tar.xz
-Extract the kernel
+Adding a Hello World System Call
+
+Preparations
+
+1. Update Your System:
+By adding the following commands update/upgrade your system first.
+
+sudo apt-get update
+sudo apt-get upgrade
+
+2. Download Packages To Compile The Kernel:
+sudo apt install build-essential libncurses-dev libssl-dev libelf-dev bison flex-y And we need and extra package which dwarves We will install it by typing sudo apt install dwarves (Compiltion occurs when we dont have this package).
+
+3. Download The Kernel:
+Download the kernel from kernel.org. wget -P ~/ https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.8.1.tar.xz
+
+4. Extract The Kernel:
 tar -xvf ~/linux-5.8.1.tar.xz -C ~/
+
 Creation
-Change your working directory
+
+1. Change Your Working Directory:
 cd ~/linux-5.8.1/
-Make folder for you system call
+
+2. Make a Folder For Your System Call:
 mkdir HelloWorld
 
-Create a C file for your system call
+3. Create a C File For Your System Call:
 nano HelloWorld/HelloWorld.c
-WRITE THE FOLLOWING CODE IN IT
-#include<linus/kernel.h>
-#include<linus/syscall.h>
-SYSCALL_DEFINE0(HelloWorld)
-{
-printk("Hello world.\n");
-return 0;
-}
 
-Create makefile for your system call
-nano HelloWorld/Makefile
-Paste this in makefile
-obj-y := HelloWorld.o
+Write the following code in it:
 
-Edit the MakeFile
-nano Makefile
-Change the version to your roll number
-SEARCH core-y
-Replace pervious with this
-kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/ HelloWorld/
+#include <linux/kernel.h> asmlinkage long sys_hello(void) { printk("Hello world\n"); return 0; }
 
-Open header file and add asmlinkage
-At the bottom of asmlimkage file before endif
-asmlinkage long sys_HelloWorld(void);
+4. Create a File For Your System Call;
+nano HelloWorld/Makefile Paste this in makefile obj-y := HelloWorld.o
 
-Add System call to kernel System call table
-440 common HelloWorld sys_HelloWorld
+5. Edit The MakeFile:
+Change the version to your roll number SEARCH core-y Replace pervious with this kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/ HelloWorld/
 
-Installation
+6. Open Header File and add asmlinkage :
+At the bottom of asmlimkage file before endif asmlinkage long sys_HelloWorld(void)
+
+7. Adding the prototype of the new system call into the system calls header file:
+Now we have to add the prototype of our system call in the system’s header file which is located in the kernel folder then “/include/linux/syscalls.h”. We have to add the prototype of our system call function in this file.
+
+Installation:
+
+Run the following commands for the installation
+
 Sudo make menuconfig
 scripts/config --disable SYSTEM_REVOCATION_KEYS
 scripts/config --disable SYSTEM_TRUSTED_KEYS
 Sudo make
 sudo make modules
 sudo make modules_install
-sudo make install
-Then an error occurs which says make bzImage
+sudo make install Then if an error occurs which says make bzImage
 sudo make bzImage
 Then sudo install
 sudo update-grub
 Restart
 
-Result
-uname -r will now show your roll number
-nano report.c
+Results:
+
+nano userspace.c
 Paste the code
-#include <linux/kernel.h>
-#include <sys/syscall.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#define __NR_HelloWorld 440
+#include <linux/kernel.h> #include <sys/syscall.h> #include <stdio.h> #include <unistd.h> #include <string.h> #include <errno.h> #define __NR_HelloWorld 440 long HelloWorld_syscall(void) { return syscall(__NR_HelloWorld); } int main(int argc, char *argv[]) { long activity; activity = HelloWorld_syscall(); if(activity < 0) { perror("system call failed."); } else { printf("System call worked \n"); } return 0; }
 
-long HelloWorld_syscall(void)
-{
-return syscall(__NR_HelloWorld);
-}
-int main(int argc, char *argv[])
-{
-long activity;
-activity = HelloWorld_syscall();
-if(activity < 0)
-{
-perror("system call failed.");
-}
-else
-{
-printf("System call worked \n");
-}
-return 0;
-}
-
-Compile and run the program
-gcc -o report report.c
-./report
-Dmesg
+RollNo "21k-3097" being displayed using uname -r command:
 
 ![kernel](https://user-images.githubusercontent.com/105592893/221377758-8e667029-962c-4ef6-94da-e9b850e780aa.png)
 
 ![k](https://user-images.githubusercontent.com/105592893/221377776-bdf96302-93b8-4985-b06b-8ed6cadae212.png)
 
-![ker](https://user-images.githubusercontent.com/105592893/221377777-76734079-6abf-4578-be21-144a7b812fd8.png)
+<img width="365" alt="221380329-c6d92756-a267-4c19-8704-2adcf30ea762" src="https://user-images.githubusercontent.com/105592893/224255238-fbf71ef6-304c-4854-967f-447e834bfb46.png">
+
 
 
 
